@@ -88,20 +88,22 @@ router.route('/:dishId/comments')
 
                 for (var i = (dish.comments.length -1); i >= 0; --i) {
                         dish.comments.id(dish.comments[i]._id).remove();
-
-                        dish.save(function (err, result) {
-                                if (err) throw err;
-
-                                res.writeHead(200, {
-                                        'Content-Type': 'text/plain'
-                                });
-                                res.end('Deleted all comments!');
-                        });
                 }
+                        
+
+                dish.save(function (err, result) {
+                        if (err) throw err;
+
+                        res.writeHead(200, {
+                                'Content-Type': 'text/plain'
+                        });
+                        res.end('Deleted all comments!');
+                });
+                
         });
 });
 
-router.route('/dishes/:dishId/comments/:commentId')
+router.route('/:dishId/comments/:commentId')
 .get(function (req, res, next) {
         Dishes.findById(req.params.dishId, function (err, dish) {
                 if (err) throw err;
