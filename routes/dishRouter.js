@@ -44,7 +44,7 @@ router.route('/:dishId')
 })
 
 .put(function(req, res, next){
-        Dish.findByIdAndUpdate(req.params.dishId, {
+        Dishes.findByIdAndUpdate(req.params.dishId, {
                 $set: req.body
         }, {
                 new: true
@@ -55,7 +55,7 @@ router.route('/:dishId')
 })
 
 .delete(function(req, res, next){
-        Dish.findByIdAndRemove(req.params.dishId, function (err, resp) {
+        Dishes.findByIdAndRemove(req.params.dishId, function (err, resp) {
                 if (err) throw err;
                 res.json(resp);
         });
@@ -70,7 +70,7 @@ router.route('/:dishId/comments')
         });
 })
 .post(function (req, res, next) {
-        Dish.findById(req.params.dishId, function (err, dish) {
+        Dishes.findById(req.params.dishId, function (err, dish) {
                 if (err) throw err;
                 
                 dish.comments.push(req.body);
@@ -83,7 +83,7 @@ router.route('/:dishId/comments')
         });
 })
 .delete(function (req, res, next) {
-        Dish.findById(req.params.dishId, function (err, dish) {
+        Dishes.findById(req.params.dishId, function (err, dish) {
                 if (err) throw err;
 
                 for (var i = (dish.comments.length -1); i >= 0; --i) {
@@ -132,7 +132,7 @@ router.route('/dishes/:dishId/comments/:commentId')
                 dish.comments.id(req.params.commentId).remove();
                 dish.save(function (err, resp) {
                         if (err) throw err;
-                        
+
                         console.log('Deleted a comment');
                         res.json(resp);
                 });
