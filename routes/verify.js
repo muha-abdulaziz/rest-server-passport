@@ -16,7 +16,7 @@ exports.verifyOrdinaryUser = function (req, res, next) {
      //decode token
      if (token) {
          //verifies secret and checks exp
-         jws.verify(token, config.secretKey, function (err, decoded) {
+         jwt.verify(token, config.secretKey, function (err, decoded) {
              if (err) {
                  var err = new Error('You are not authenticated!');
                  err.status = 401;
