@@ -7,6 +7,17 @@ exports.getToken = function (user) {
         expiresIn: 3600
     });
 };
+function notAuthError() {
+    var err = new Error('You are not authenticated!');
+    err.status = 401;
+    return err;
+};
+
+function noTokenError() {
+    var err = new Error('No token provided!');
+    err.status = 403;
+    return err;
+};
 
 exports.verifyOrdinaryUser = function (req, res, next) {
     // check header or url parameters or post parameters for token
@@ -17,11 +28,8 @@ exports.verifyOrdinaryUser = function (req, res, next) {
      if (token) {
          //verifies secret and checks exp
          jwt.verify(token, config.secretKey, function (err, decoded) {
-             if (err) {
-                 var err = new Error('You are not authenticated!');
-                 err.status = 401;
-                 return next(err);
-             } else {
+             if (err) next(notAuthError());
+             else {
                  //if everything is good, save to request for
                  //use in other routes
                  req.decoded = decoded;
@@ -31,8 +39,33 @@ exports.verifyOrdinaryUser = function (req, res, next) {
      } else {
          // if there is no token
          //return error
-         var err = new Error('No token provided!');
-         err.status = 403;
-         return next(err);
+         next(noTokenError());
+     }
+};
+
+exports.verifyAdmin = function (req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.query.token ||
+     req.headers['x-access-token'];
+
+     //decode token
+     if (token) {
+         //verifies secret and checks exp
+         jwt.verify(token, config.secretKey, function (err, decoded) {
+             if (err) next(notAuthError());
+
+             var checkAdmin = decoded._doc.admin;
+             if (!checkAdmin) next(notAuthError());
+             else {
+                 //if everything is good, save to request for
+                 //use in other routes
+                 req.decoded = decoded;
+                 next();
+             }
+         });
+     } else {
+         // if there is no token
+         //return error
+         next(noTokenError());
      }
 };
