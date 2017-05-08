@@ -13,11 +13,15 @@ function notAuthError() {
     return err;
 };
 
-function noTokenError() {
-    var err = new Error('No token provided!');
+function Error403(msg) {
+    var err = new Error(msg);
     err.status = 403;
     return err;
 };
+
+var noTokenError = Error403('No token provided!');
+
+var privilegeError = Error403('You not autherized to perform this operation!');
 
 exports.verifyOrdinaryUser = function (req, res, next) {
     // check header or url parameters or post parameters for token
@@ -28,7 +32,7 @@ exports.verifyOrdinaryUser = function (req, res, next) {
      if (token) {
          //verifies secret and checks exp
          jwt.verify(token, config.secretKey, function (err, decoded) {
-             if (err) next(notAuthError());
+             if (err) next(notAuthError);
              else {
                  //if everything is good, save to request for
                  //use in other routes
@@ -39,7 +43,7 @@ exports.verifyOrdinaryUser = function (req, res, next) {
      } else {
          // if there is no token
          //return error
-         next(noTokenError());
+         next(noTokenError);
      }
 };
 
@@ -52,10 +56,10 @@ exports.verifyAdmin = function (req, res, next) {
      if (token) {
          //verifies secret and checks exp
          jwt.verify(token, config.secretKey, function (err, decoded) {
-             if (err) next(notAuthError());
+             if (err) next(notAuthError);
 
              var checkAdmin = decoded._doc.admin;
-             if (!checkAdmin) next(notAuthError());
+             if (!checkAdmin) next(privilegeError);
              else {
                  //if everything is good, save to request for
                  //use in other routes
@@ -66,6 +70,6 @@ exports.verifyAdmin = function (req, res, next) {
      } else {
          // if there is no token
          //return error
-         next(noTokenError());
+         next(noTokenError);
      }
 };
